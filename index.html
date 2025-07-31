@@ -1,0 +1,134 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    var emailsCadastrados = [];
+ 
+    $(document).ready(function () {
+  
+      $("#button1").prop("disabled", true);
+ 
+      $("input").on("input", function () {
+        var nome = $("#nome").val().trim();
+        var login = $("#login").val().trim();
+        var senha = $("#senha").val().trim();
+        var confirmaSenha = $("#confirmaSenha").val().trim();
+        var email = $("#email").val().trim();
+        var telefone = $("#telefone").val().trim();
+ 
+        if (nome && login && senha && confirmaSenha && email && telefone) {
+          $("#button1").prop("disabled", false);
+        } else {
+          $("#button1").prop("disabled", true);
+        }
+      });
+ 
+      $("#button1").click(function () {
+        var nome = $("#nome").val().trim();
+        var login = $("#login").val().trim();
+        var senha = $("#senha").val().trim();
+        var confirmaSenha = $("#confirmaSenha").val().trim();
+        var email = $("#email").val().trim();
+        var telefone = $("#telefone").val().trim();
+ 
+
+        if (senha.length !== 8) {
+          $("p").html("A senha deve ter 8 caracteres.");
+          return;
+        }
+        if (!senha.match(/[A-Z]/)) {
+          $("p").html("A senha deve conter pelo menos uma letra maiúscula.");
+          return;
+        }
+        if (!senha.match(/[a-z]/)) {
+          $("p").html("A senha deve conter pelo menos uma letra minúscula.");
+          return;
+        }
+        if (!senha.match(/[0-9]/)) {
+          $("p").html("A senha deve conter pelo menos um número.");
+          return;
+        }
+        if (!senha.match(/[^A-Za-z0-9]/)) {
+          $("p").html("A senha deve conter pelo menos um caractere especial.");
+          return;
+        }
+ 
+        if (senha !== confirmaSenha) {
+          $("p").html("As senhas não coincidem.");
+          return;
+        }
+ 
+        if (!email.includes("@")) {
+          $("p").html("O e-mail deve conter '@'.");
+          return;
+        }
+ 
+        if (emailsCadastrados.includes(email)) {
+          $("p").html("Este e-mail já foi utilizado.");
+          return;
+        }
+     
+ 
+ 
+        $.ajax({
+          url: "insert.php",
+          type: "POST",
+          data:
+            "campo1=" + nome + "& campo2=" + login + "& campo3=" + senha + "& campo4=" + confirmaSenha + "& campo5=" + email + "& campo6=" + telefone,
+          dataType: "html",
+        })
+          .done(function (resposta) {
+            $("p").html(resposta);
+            emailsCadastrados.push(email);
+          })
+          .fail(function (jqXHR, textStatus) {
+            $("p").html("Erro na requisição: " + textStatus);
+          })
+          .always(function () {
+            console.log("Requisição finalizada");
+          });
+      });
+    });
+  </script>
+ 
+</head>
+ 
+<body>
+  <div class="container">
+    <div class="books">📚</div>
+    <h1>Cadastro na Livraria</h1>
+    <p class="subtitle">Preencha seus dados abaixo</p>
+ 
+    <input type="text" id="nome" placeholder="Nome" /><br />
+    <input type="text" id="login" placeholder="Login" /><br />
+    <div class="senha-container">
+      <input type="password" id="senha" placeholder="Senha" />
+      <div class="senha-requisitos">
+        A senha deve conter:
+        <ul>
+          <li> 8 caracteres</li>
+          <li> Uma letra maiúscula</li>
+          <li> Uma letra minúscula</li>
+          <li> Um número</li>
+          <li> Um caractere especial (ex: @, #, !, etc.)</li>
+        </ul>
+      </div>
+    </div> <br>
+    <input type="password" id="confirmaSenha" placeholder="Confirmar Senha" /><br />
+    <input type="email" id="email" placeholder="Email" /><br />
+    <input type="tel" id="telefone" placeholder="Telefone" /><br />
+    <input type="file" id="imageUpload" accept=".png, .jpg, .jpeg" /><br /><br />
+    <button id="button1">Cadastrar</button>
+    
+  </div>
+</body>
+</html>
+ 
+ 
+ 
+ 
